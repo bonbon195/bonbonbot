@@ -28,8 +28,8 @@ class MusicCog(commands.Cog):
                 info = ydl.extract_info(f"ytsearch:{item}", download=False)['entries'][0]
             except Exception:
                 return False
-            except TypeError:
-                return False
+            # except TypeError:
+            #     return False
         return {'source': info['formats'][0]['url'], 'title': info['title']}
 
     def play_next(self, guildId):
