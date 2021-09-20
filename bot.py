@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import youtube_dl
 from youtube_dl import YoutubeDL
+from functools import partial # <--------
 client = commands.Bot(command_prefix='!')
 
 # Suppress noise about console usage from errors
@@ -28,8 +29,8 @@ class MusicCog(commands.Cog):
                 info = ydl.extract_info(f"ytsearch:{item}", download=False)['entries'][0]
             except Exception:
                 return False
-            # except TypeError:
-            #     return False
+            except TypeError:
+                return False
         return {'source': info['formats'][0]['url'], 'title': info['title']}
 
     def play_next(self, guildId):
@@ -40,7 +41,7 @@ class MusicCog(commands.Cog):
 
             self.music_queue[guildId].pop(0)
 
-            self.vc[guildId].play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTS), after=lambda e: self.play_next(guildId))
+            self.vc[guildId].play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTS), after=partial(self.play_next, guildId))
         else:
             self.is_playing[guildId] = False
 
@@ -56,6 +57,7 @@ class MusicCog(commands.Cog):
                 try:
                     self.vc[ctx.guild.id] = await self.client.move_to(self.music_queue[ctx.guild.id][0][1])
                 except AttributeError:
+                    self.is_playing[ctx.guild.id] = False
                     return
             print(self.music_queue[ctx.guild.id])
 
@@ -68,7 +70,7 @@ class MusicCog(commands.Cog):
             await ctx.send(embed=embed)
             self.music_queue[ctx.guild.id].pop(0)
 
-            self.vc[ctx.guild.id].play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTS), after=lambda e: self.play_next(ctx.guild.id))
+            self.vc[ctx.guild.id].play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTS), after=partial(self.play_next, ctx.guild.id))
         else:
             self.is_playing[ctx.guild.id] = False
     @commands.command()
@@ -121,6 +123,7 @@ class MusicCog(commands.Cog):
         voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
         if voice.is_connected():
             await voice.disconnect()
+            self.is_playing[ctx.guild.id] = False
             if not ctx.guild.id in self.music_queue: self.music_queue[ctx.guild.id] = []
             self.music_queue[ctx.guild.id].clear()
 
@@ -143,12 +146,14 @@ class MusicCog(commands.Cog):
     @commands.command()
     async def stop(self, ctx):
         voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+        self.is_playing[ctx.guild.id] = False
         voice.stop()
 
     @commands.command()
     async def clear(self, ctx):
         if not ctx.guild.id in self.music_queue: self.music_queue[ctx.guild.id] = []
         self.music_queue[ctx.guild.id].clear()
+        self.is_playing[ctx.guild.id] = False
         embed = discord.Embed(title="",
                               description=f"Queue is cleared. [{ctx.author.mention}]",
                               color=discord.Color(0xff3aab))
