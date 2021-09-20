@@ -17,7 +17,7 @@ class MusicCog(commands.Cog):
         self.client = client
         self.is_playing = {}
         self.music_queue = {}
-        self.ydl_opts = {'format': 'bestaudio/best', 'noplaylist': True,}
+        self.ydl_opts = {'format': 'bestaudio/best', 'noplaylist': True, 'ignoreerrors': True}
         self.FFMPEG_OPTS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
         self.vc = {}
@@ -27,6 +27,8 @@ class MusicCog(commands.Cog):
             try:
                 info = ydl.extract_info(f"ytsearch:{item}", download=False)['entries'][0]
             except Exception:
+                return False
+            except TypeError:
                 return False
         return {'source': info['formats'][0]['url'], 'title': info['title']}
 
@@ -79,7 +81,7 @@ class MusicCog(commands.Cog):
         else:
             song = self.search_yt(query)
             if type(song) == type(True):
-                await ctx.send(f"something went wrong or idk")
+                await ctx.send(f"This video is inappropriate or this is a playlist")
             else:
                 self.music_queue[ctx.guild.id].append([song, voice_channel])
                 title = ""
