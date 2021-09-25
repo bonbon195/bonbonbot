@@ -169,6 +169,6 @@ class MusicCog(commands.Cog):
 
 client.add_cog(MusicCog(client))
 
-with open("token2.txt") as file:
+with open("token.txt") as file:
     token = file.read()
 client.run(token)
