@@ -3,7 +3,7 @@ from discord.ext import commands
 import youtube_dl
 from youtube_dl import YoutubeDL
 
-client = commands.Bot(command_prefix='-')
+client = commands.Bot(command_prefix='!')
 
 # Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ''
