@@ -11,7 +11,7 @@ youtube_dl.utils.bug_reports_message = lambda: ''
 
 @client.event
 async def on_ready():
-    print("second {0.user}".format(client))
+    print("chilling as {0.user}".format(client))
 
 
 class MusicCog(commands.Cog):
