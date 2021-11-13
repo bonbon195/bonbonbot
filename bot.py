@@ -3,6 +3,8 @@ from discord import FFmpegPCMAudio
 from discord.ext import commands
 import youtube_dl
 import asyncio
+import time
+from discord.ext import tasks
 
 client = commands.Bot(command_prefix='!')
 
@@ -34,17 +36,11 @@ def start(ctx):
         if voice is None or not voice.is_playing():
             title = queues[ctx.guild.id][0][0]
             source = queues[ctx.guild.id][0][1]
-            print(source)
             voice.play(FFmpegPCMAudio(source, **FFMPEG_OPTS), after=lambda e: start(ctx))
             voice.is_playing()
             asyncio.run_coroutine_threadsafe(start_message(ctx, title), ctx.bot.loop)
-            print("voiice", voice.is_playing())
             now_playing[ctx.guild.id] = queues[ctx.guild.id][0][0]
-
-            print("now", now_playing[ctx.guild.id])
             queues[ctx.guild.id].pop(0)
-        else:
-            voice = None
 
 
 async def add(ctx, title, source):
@@ -52,8 +48,6 @@ async def add(ctx, title, source):
         queues[ctx.guild.id].insert(0, [title, source])
     else:
         queues[ctx.guild.id].append([title, source])
-    print(queues)
-    print(len(queues[ctx.guild.id]))
     embed = discord.Embed(title="",
                           description=f":pencil: Added song: \n `{title}` \n - To queue! \n {ctx.author.mention}",
                           color=discord.Color(0xff3aab))
@@ -86,21 +80,29 @@ async def on_ready():
 
 @client.command()
 async def play(ctx, *, url):
-    voice_channel = ctx.author.voice.channel
-    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-    if voice is None or not voice.is_connected:
-        await voice_channel.connect()
-    else:
-        pass
-    print("voice", voice)
-    if ctx.guild.id not in queues:
-        queues[ctx.guild.id] = []
-    print("queuq", queues)
-    print(url)
-    await search_message(ctx, url)
-    title, video, source = search(url)
-    await add(ctx, title, source)
-    start(ctx)
+    try:
+        voice_channel = ctx.author.voice.channel
+        voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+        if voice is None or not voice.is_connected:
+            await voice_channel.connect()
+        else:
+            pass
+        if ctx.guild.id not in queues:
+            queues[ctx.guild.id] = []
+        await search_message(ctx, url)
+        title, video, source = search(url)
+        await add(ctx, title, source)
+        start(ctx)
+
+        @tasks.loop(minutes=5)
+        async def count():
+            if len(voice_channel.members) == 1:
+                await leave(ctx)
+                count.stop()
+
+        count.start()
+    except:
+        AttributeError
 
 
 @client.command()
@@ -110,7 +112,6 @@ async def queue(ctx):
     retval = ""
     for i in range(0, len(queues[ctx.guild.id])):
         retval += "`" + queues[ctx.guild.id][i][0] + "`" + "\n"
-    print(retval)
     if retval != "":
         embed = discord.Embed(title="",
                               description=f":notes:Queue is: \n {retval}\n[{ctx.author.mention}]",
@@ -172,6 +173,7 @@ async def pause(ctx):
     except:
         AttributeError
 
+
 @client.command()
 async def resume(ctx):
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
@@ -187,7 +189,6 @@ async def resume(ctx):
         AttributeError
 
 
-
 @client.command()
 async def stop(ctx):
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
@@ -197,7 +198,6 @@ async def stop(ctx):
             voice.stop()
     except:
         AttributeError
-
 
 
 with open("token.txt") as file:
