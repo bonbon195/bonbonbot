@@ -95,12 +95,6 @@ async def add(ctx, title, source, duration, channel, channel_url, webpage_url, t
         embed.add_field(name="Channel", value=f"[{channel}]({channel_url})", inline=True)
         embed.add_field(name="Duration", value=f"{duration}", inline=True)
         await ctx.send(embed=embed)
-        # embed = discord.Embed(description=f"[{title}]({webpage_url})", color=discord.Color(0xe974b5))
-        # embed.set_author(name="Added to queue:", icon_url=f"{author.avatar_url}")
-        # embed.set_thumbnail(url=f"{thumbnail}")
-        # embed.add_field(name="Channel", value=f"[{channel}]({channel_url})", inline=True)
-        # embed.add_field(name="Duration", value=f"{duration}", inline=True)
-        # await ctx.send(embed=embed)
 
 
 async def search_message(ctx, url):
