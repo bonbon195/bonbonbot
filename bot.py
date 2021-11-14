@@ -248,6 +248,8 @@ async def skip(ctx):
     try:
         if voice.is_playing():
             voice.stop()
+            if ctx.guild.id in now_playing:
+                now_playing.pop(ctx.guild.id)
             await play_music(ctx)
     except:
         AttributeError
