@@ -347,7 +347,7 @@ async def help(ctx):
     embed.add_field(name="play", value=f"Играть музыку. Бот принимает значения в формате:\n"
                                        f"{pref}play название песни\n"
                                        f"{pref}play ссылка")
-    embed.add_field(name="prefix", value=f"Поменять префикс для комманд. Пример: {pref}prefix новый_префикс")
+    embed.add_field(name="prefix", value=f"Поменять префикс для команд. Пример: {pref}prefix новый_префикс")
     await ctx.send(embed=embed)
 
 
