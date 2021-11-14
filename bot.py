@@ -67,6 +67,7 @@ def play_music(ctx):
     except:
         AttributeError
 
+
 async def add(ctx, title, source, duration, channel, channel_url, webpage_url, thumbnail, author):
     if ctx.guild.id not in now_playing:
         now_playing[ctx.guild.id] = {}
@@ -169,7 +170,7 @@ async def play(ctx, *, url):
             if seconds < 10:
                 seconds = "0" + str(seconds)
 
-            duration = minutes + ":" + seconds
+            duration = minutes + ":" + str(seconds)
             return duration
 
         duration = (seconds_to_minutes(duration))
@@ -196,7 +197,7 @@ async def queue(ctx):
         embed.set_author(name=f"Queue", icon_url=f"{ctx.author.avatar_url}")
         for i in range(0, len(queues[ctx.guild.id])):
             embed.add_field(name="\u200b", value=f"**{i + 1}.** [{queues[ctx.guild.id][i]['title']}]"
-                                  f"({queues[ctx.guild.id][i]['webpage_url']})", inline=False)
+                                                 f"({queues[ctx.guild.id][i]['webpage_url']})", inline=False)
             i += 1
         await ctx.send(embed=embed)
     else:
@@ -266,7 +267,6 @@ async def leave(ctx):
             await voice.disconnect()
     except:
         AttributeError
-
 
 
 @client.command()
@@ -345,7 +345,7 @@ async def help(ctx):
     embed.add_field(name="play", value=f"Играть музыку. Бот принимает значения в формате:\n"
                                        f"{pref}play название песни\n"
                                        f"{pref}play ссылка")
-    embed.add_field(name="prefix", value="Поменять префикс для комманд. Пример: !prefix новый_префикс")
+    embed.add_field(name="prefix", value=f"Поменять префикс для комманд. Пример: {pref}prefix новый_префикс")
     await ctx.send(embed=embed)
 
 
