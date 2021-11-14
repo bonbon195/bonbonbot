@@ -164,9 +164,12 @@ async def play(ctx, *, url):
         author = ctx.author
 
         def seconds_to_minutes(duration):
-            minutes = duration // 60
+            minutes = str(duration // 60)
             seconds = duration % 60
-            duration = str(minutes) + ":" + str(seconds)
+            if seconds < 10:
+                seconds = "0" + str(seconds)
+
+            duration = minutes + ":" + seconds
             return duration
 
         duration = (seconds_to_minutes(duration))
