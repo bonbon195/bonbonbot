@@ -40,11 +40,6 @@ async def start_playing_message(ctx, title, duration, channel, channel_url, webp
     await ctx.send(embed=embed)
 
 
-# def clear_now():
-#     if ctx.guild.id in now_playing:
-#         c
-
-
 def play_music(ctx):
     try:
         voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
