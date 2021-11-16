@@ -1,3 +1,5 @@
+import os
+
 import discord
 from discord import FFmpegPCMAudio
 from discord.ext import commands
@@ -339,7 +341,5 @@ async def help(ctx):
     embed.add_field(name="prefix", value=f"Поменять префикс для команд. Пример: {pref}prefix новый_префикс")
     await ctx.send(embed=embed)
 
-
-with open("token.txt") as file:
-    token = file.read()
+token = os.environ["token"]
 client.run(token)
