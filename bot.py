@@ -28,6 +28,7 @@ ydl_opts = {
     'username': os.environ["username"],
     'password': os.environ["password"],
     'cookiefile': 'cookies.txt',
+    'noplaylist': True,
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
         'preferredcodec': 'mp3',
@@ -121,7 +122,7 @@ def search(query):
 
 @client.event
 async def on_ready():
-    print("attackontitan {0.user}".format(client))
+    print("bonbonbot {0.user}".format(client))
 
 
 @client.event
@@ -131,9 +132,11 @@ async def on_guild_join(guild):
 
     prefixes[str(guild.id)] = '!'
 
-    with open('prefixes.json', 'w') as f:
+    with open('prefixes.json', 'wb') as f:
         json.dump(prefixes, f, indent=4)
-        dbx.files_upload(path="/prefixes.json")
+
+    with open('prefixes.json', 'rb') as f:
+        dbx.files_upload(f.read(), path="/prefixes.json", mode=dropbox.files.WriteMode.overwrite)
 
 @client.event
 async def on_guild_remove(guild):
@@ -142,9 +145,12 @@ async def on_guild_remove(guild):
 
     prefixes.pop(str(guild.id))
 
-    with open('prefixes.json', 'w') as f:
+    with open('prefixes.json', 'wb') as f:
         json.dump(prefixes, f, indent=4)
-        dbx.files_upload(path="/prefixes.json")
+
+    with open('prefixes.json', 'rb') as f:
+        dbx.files_upload(f.read(), path="/prefixes.json", mode=dropbox.files.WriteMode.overwrite)
+
 
 @client.command()
 async def play(ctx, *, url):
@@ -318,6 +324,9 @@ async def prefix(ctx, pref):
 
     with open('prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent=4)
+
+    with open('prefixes.json', 'rb') as f:
+        dbx.files_upload(f.read(), path="/prefixes.json", mode=dropbox.files.WriteMode.overwrite)
 
     embed = discord.Embed(description=f"{pref}", colour=discord.Color(0xe974b5))
     embed.set_author(name="Prefix changed to:", icon_url=f"{ctx.author.avatar_url}")
