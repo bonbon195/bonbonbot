@@ -12,7 +12,7 @@ dbx = dropbox.Dropbox(oauth2_access_token=os.environ['access_token'])
 current_dir = os.getcwd()
 
 def get_prefix(client, ctx):  # first we define get_prefix
-    print(dbx.files_download_to_file(current_dir, '/' + "prefixes.json"))
+    dbx.files_download_to_file(path="/prefixes.json", download_path=current_dir + "/prefixes.json")
     with open('prefixes.json', 'r') as f:  # we open and read the prefixes.json, assuming it's in the same file
 
         prefixes = json.load(f)  # load the json as prefixes
