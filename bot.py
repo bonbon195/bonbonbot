@@ -133,7 +133,7 @@ async def on_guild_join(guild):
 
     with open('prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent=4)
-        dbx.files_upload()
+        dbx.files_upload(path="/prefixes.json")
 
 @client.event
 async def on_guild_remove(guild):
@@ -144,7 +144,7 @@ async def on_guild_remove(guild):
 
     with open('prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent=4)
-        dbx.files_upload()
+        dbx.files_upload(path="/prefixes.json")
 
 @client.command()
 async def play(ctx, *, url):
