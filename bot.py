@@ -1,17 +1,20 @@
 import os
-
 import discord
 from discord import FFmpegPCMAudio
 from discord.ext import commands
 import youtube_dl
 import asyncio
-import time
 from discord.ext import tasks
 import json
+import dropbox
 
+dbx = dropbox.Dropbox(oauth2_access_token=os.environ['access_token'])
+current_dir = os.getcwd()
 
 def get_prefix(client, ctx):  # first we define get_prefix
+    print(dbx.files_download_to_file(current_dir, '/' + "prefixes.json"))
     with open('prefixes.json', 'r') as f:  # we open and read the prefixes.json, assuming it's in the same file
+
         prefixes = json.load(f)  # load the json as prefixes
     return prefixes[str(ctx.guild.id)]  # recieve the prefix for the guild id given
 
@@ -22,6 +25,9 @@ queues = {}
 now_playing = {}
 ydl_opts = {
     'format': 'bestaudio/best', 'ignoreerrors': True,
+    'username': os.environ["username"],
+    'password': os.environ["password"],
+    'cookiefile': 'cookies.txt',
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
         'preferredcodec': 'mp3',
@@ -127,7 +133,7 @@ async def on_guild_join(guild):
 
     with open('prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent=4)
-
+        dbx.files_upload()
 
 @client.event
 async def on_guild_remove(guild):
@@ -138,7 +144,7 @@ async def on_guild_remove(guild):
 
     with open('prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent=4)
-
+        dbx.files_upload()
 
 @client.command()
 async def play(ctx, *, url):
