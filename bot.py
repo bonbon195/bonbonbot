@@ -11,6 +11,7 @@ import dropbox
 dbx = dropbox.Dropbox(oauth2_access_token=os.environ['access_token'])
 current_dir = os.getcwd()
 
+
 def get_prefix(client, ctx):  # first we define get_prefix
     dbx.files_download_to_file(path="/prefixes.json", download_path=current_dir + "/prefixes.json")
     with open('prefixes.json', 'r') as f:  # we open and read the prefixes.json, assuming it's in the same file
@@ -25,8 +26,6 @@ queues = {}
 now_playing = {}
 ydl_opts = {
     'format': 'bestaudio/best', 'ignoreerrors': True,
-    'username': os.environ["username"],
-    'password': os.environ["password"],
     'cookiefile': 'cookies.txt',
     'noplaylist': True,
     'postprocessors': [{
@@ -110,12 +109,12 @@ async def search_message(ctx, url):
 def search(query):
     with ytdl:
         try:
-            requests.get(query)
+            if query.startswith("http"):
+                info = ytdl.extract_info(query, download=False)
+            else:
+                requests.get(query)
         except:
             info = ytdl.extract_info(f"ytsearch:{query}", download=False)['entries'][0]
-
-        else:
-            info = ytdl.extract_info(query, download=False)
         return info['title'], info['formats'][0]['url'], info['duration'], info['channel'], info['channel_url'], \
                info['webpage_url'], info['thumbnail']
 
@@ -132,7 +131,7 @@ async def on_guild_join(guild):
 
     prefixes[str(guild.id)] = '!'
 
-    with open('prefixes.json', 'wb') as f:
+    with open('prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent=4)
 
     with open('prefixes.json', 'rb') as f:
@@ -145,7 +144,7 @@ async def on_guild_remove(guild):
 
     prefixes.pop(str(guild.id))
 
-    with open('prefixes.json', 'wb') as f:
+    with open('prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent=4)
 
     with open('prefixes.json', 'rb') as f:
