@@ -137,6 +137,7 @@ async def on_guild_join(guild):
     with open('prefixes.json', 'rb') as f:
         dbx.files_upload(f.read(), path="/prefixes.json", mode=dropbox.files.WriteMode.overwrite)
 
+
 @client.event
 async def on_guild_remove(guild):
     with open('prefixes.json', 'r') as f:
@@ -202,6 +203,35 @@ async def queue(ctx):
                                                  f"({queues[ctx.guild.id][i]['webpage_url']})", inline=False)
             i += 1
         await ctx.send(embed=embed)
+        print(queues)
+    else:
+        embed = discord.Embed(color=discord.Color(0xe974b5))
+        embed.set_author(name=f"Queue is empty!", icon_url=f"{ctx.author.avatar_url}")
+        await ctx.send(embed=embed)
+
+
+@client.command()
+async def delete(ctx,  num: int):
+    if len(queues[ctx.guild.id]) != 0:
+        if num != 0 and num > 0:
+            title = queues[ctx.guild.id][num - 1]['title']
+            duration = queues[ctx.guild.id][num - 1]['duration']
+            channel = queues[ctx.guild.id][num - 1]['channel']
+            channel_url = queues[ctx.guild.id][num - 1]['channel_url']
+            webpage_url = queues[ctx.guild.id][num - 1]['webpage_url']
+            thumbnail = queues[ctx.guild.id][num - 1]['thumbnail']
+            author = queues[ctx.guild.id][num - 1]['author']
+            queues[ctx.guild.id].pop(num - 1)
+            embed = discord.Embed(description=f"**{num}.** [{title}]({webpage_url})", color=discord.Color(0xe974b5))
+            embed.set_author(name="Removed from queue:", icon_url=f"{author.avatar_url}")
+            embed.set_thumbnail(url=f"{thumbnail}")
+            embed.add_field(name="Channel", value=f"[{channel}]({channel_url})", inline=True)
+            embed.add_field(name="Duration", value=f"{duration}", inline=True)
+            await ctx.send(embed=embed)
+        else:
+            embed = discord.Embed(color=discord.Color(0xe974b5))
+            embed.set_author(name=f"There is no song under this number!", icon_url=f"{ctx.author.avatar_url}")
+            await ctx.send(embed=embed)
     else:
         embed = discord.Embed(color=discord.Color(0xe974b5))
         embed.set_author(name=f"Queue is empty!", icon_url=f"{ctx.author.avatar_url}")
@@ -352,8 +382,10 @@ async def help(ctx):
     embed.add_field(name="play", value=f"Играть музыку. Бот принимает значения в формате:\n"
                                        f"{pref}play название песни\n"
                                        f"{pref}play ссылка")
-    embed.add_field(name="prefix", value=f"Поменять префикс для команд. Пример: {pref}prefix новый_префикс")
+    embed.add_field(name="delete", value=f"Удалить песню из очереди.\nПример:{pref}delete 4")
+    embed.add_field(name="prefix", value=f"Поменять префикс для команд. Пример:\n{pref}prefix новый_префикс")
     await ctx.send(embed=embed)
+
 
 token = os.environ["token"]
 client.run(token)
