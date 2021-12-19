@@ -126,10 +126,12 @@ async def on_ready():
 
 @client.event
 async def on_guild_join(guild):
+    if not os.path.isfile("prefixes.json"):
+        dbx.files_download_to_file(path="/prefixes.json", download_path=current_dir + "/prefixes.json")
     with open('prefixes.json', 'r') as f:
         prefixes = json.load(f)
-
-    prefixes[str(guild.id)] = '!'
+    if not str(guild.id) in prefixes:
+        prefixes[str(guild.id)] = '!'
 
     with open('prefixes.json', 'w') as f:
         json.dump(prefixes, f, indent=4)
@@ -140,6 +142,8 @@ async def on_guild_join(guild):
 
 @client.event
 async def on_guild_remove(guild):
+    if not os.path.isfile("prefixes.json"):
+        dbx.files_download_to_file(path="/prefixes.json", download_path=current_dir + "/prefixes.json")
     with open('prefixes.json', 'r') as f:
         prefixes = json.load(f)
 
