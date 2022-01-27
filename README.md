@@ -1,7 +1,1 @@
-Пушка
-Гонка
-
-<!---
-bonbon195/bonbon195 is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-You can click the Preview link to take a look at your changes.
---->
+This is a discord music bot. It stores all prefixes on dropbox. Default prefix is "!".
