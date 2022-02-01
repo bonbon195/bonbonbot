@@ -189,9 +189,9 @@ async def play(ctx, *, url):
             if len(voice_channel.members) == 1:
                 await leave(ctx)
                 count.stop()
-            elif (voice is None or not voice.is_playing()) and len(queues[ctx.guild.id]) == 0:
-                await leave(ctx)
-                count.stop()
+#             elif (voice is None or not voice.is_playing()) and len(queues[ctx.guild.id]) == 0:
+#                 await leave(ctx)
+#                 count.stop()
         count.start()
     except:
         AttributeError
