@@ -189,7 +189,7 @@ async def play(ctx, *, url):
             if len(voice_channel.members) == 1:
                 await leave(ctx)
                 count.stop()
-            elif (not voice.is_playing or voice is None) and len(queues[ctx.guild.id]) == 0:
+            elif (voice is None or not voice.is_playing()) and len(queues[ctx.guild.id]) == 0:
                 await leave(ctx)
                 count.stop()
         count.start()
